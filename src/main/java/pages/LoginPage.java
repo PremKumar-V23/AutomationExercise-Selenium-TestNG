@@ -22,6 +22,13 @@ public class LoginPage extends BasePage {
     // Validation Locator
     private By loginHeader = By.xpath("//h2[text()='Login to your account']");
 
+    // Login Error Message
+    private By loginErrorMessage =
+            By.xpath("//*[contains(text(),'Your email or password is incorrect!')]");
+
+    private By ExistingEmailErrorMessage =
+            By.xpath("//*[contains(text(),'Email Address already exist!')]");
+
     // Signup
     public void signUp(String name, String email) {
         type(signupName, name);
@@ -39,5 +46,14 @@ public class LoginPage extends BasePage {
     // Validation
     public boolean isLoginPageDisplayed() {
         return isDisplayed(loginHeader);
+    }
+
+
+    public boolean isLoginErrorDisplayed(){
+        return isDisplayed(loginErrorMessage);
+    }
+
+    public boolean isEmailExixtingErrorDisplayed(){
+        return isDisplayed(ExistingEmailErrorMessage);
     }
 }
