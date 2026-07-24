@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,18 +23,12 @@ public class BasePage {
     }
 
     protected void click(By locator) {
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-        element.click();
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
     protected void jsClick(By locator) {
-        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", element);
-    }
-
-    protected boolean isDisplayed(By locator) {
-        return find(locator).isDisplayed();
+        WebElement element = driver.findElement(locator);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 
     protected void type(By locator, String text) {
@@ -42,35 +37,51 @@ public class BasePage {
         element.sendKeys(text);
     }
 
-    protected void selectByVisibleText(By locator, String visibleText) {
-        Select select = new Select(find(locator));
-        select.selectByVisibleText(visibleText);
+    protected boolean isDisplayed(By locator) {
+        try {
+            return driver.findElement(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected void hover(By locator) {
+        Actions actions = new Actions(driver);
+        actions.moveToElement(find(locator)).pause(Duration.ofMillis(500)).perform();
+    }
+
+    protected void selectByVisibleText(By locator, String text) {
+        new Select(find(locator)).selectByVisibleText(text);
     }
 
     protected void selectByValue(By locator, String value) {
-        Select select = new Select(find(locator));
-        select.selectByValue(value);
+        new Select(find(locator)).selectByValue(value);
     }
 
     protected void selectByIndex(By locator, int index) {
-        Select select = new Select(find(locator));
-        select.selectByIndex(index);
+        new Select(find(locator)).selectByIndex(index);
     }
 
-    protected void upload(By locator, String filePath) {
-        find(locator).sendKeys(filePath);
+    protected void upload(By locator, String path) {
+        find(locator).sendKeys(path);
+    }
+
+    protected void acceptAlert() {
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
     }
 
     protected String getCurrentUrl() {
         return driver.getCurrentUrl();
     }
 
-    protected void acceptAlert() {
-        driver.switchTo().alert().accept();
+    protected void scrollToBottom() {
+        ((JavascriptExecutor) driver)
+                .executeScript("window.scrollTo(0, document.body.scrollHeight)");
     }
 
-    protected void scrollToBottom() {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+    protected void scrollIntoView(By locator) {
+        WebElement element = driver.findElement(locator);
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView({block:'center'});", element);
     }
 }
